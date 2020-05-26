@@ -1,4 +1,5 @@
 const fs = require('fs')
+const chalk = require('chalk')
 
 
 const getNotes = function () {
@@ -26,6 +27,24 @@ const addNote = function (title,body) {
     
 }
 
+const removeNote = function (title) {
+    const notes = loadNotes()
+
+    console.log('remove note funciton called for note of title ' + title)
+
+    const newNotes = notes.filter( function (note) {
+        return note.title !== title
+    })
+
+    if(notes.length === newNotes.length) {
+        console.log(chalk.red('Given title does not exist!'))
+    } else {
+        console.log(chalk.green('Note removed successfully'))
+        saveNotes(newNotes)
+    }
+
+}
+
 const saveNotes = function (notes) {
     const dataJSON = JSON.stringify(notes)
     fs.writeFileSync('notes.json', dataJSON)
@@ -45,5 +64,6 @@ const loadNotes = function () {
 
 module.exports = {
     getNotes: getNotes,
-    addNote : addNote
+    addNote : addNote,
+    removeNote : removeNote
 }
