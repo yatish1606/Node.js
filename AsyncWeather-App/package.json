@@ -5,7 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "chalk": "^4.0.0",
-    "postman-request": "^2.88.1-postman.22"
+    "postman-request": "^2.88.1-postman.22",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {},
   "scripts": {
