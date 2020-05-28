@@ -6,20 +6,24 @@ const getForecast = require('./utilities/getForecast')
 
 const address = process.argv[2]
 
-getGeocode(address, (error, recievedDataGeocode) => {
+if(!address) {
+    console.log(chalk.bgRed('ERROR : Invalid address'))
+} else {
+    getGeocode(address, (error, {latitude, longitude, location} = {} ) => {
 
-    if(error) {
-        return console.log(error)
-    }
-    
-    getForecast(recievedDataGeocode.latitude,recievedDataGeocode.longitude, (error,recievedDataForecast) => {
         if(error) {
             return console.log(error)
         }
-        console.log(recievedDataGeocode.location)
-        console.log(recievedDataForecast)
+        
+        getForecast(latitude,longitude, (error,recievedDataForecast) => {
+            if(error) {
+                return console.log(error)
+            }
+            console.log(location)
+            console.log(recievedDataForecast)
+        })
+    
     })
-
-})
+}
 
 yargs.parse()

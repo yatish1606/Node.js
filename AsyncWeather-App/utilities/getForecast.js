@@ -7,14 +7,14 @@ const getForecast = function (latitude, longitude, callback) {
     request( {
         url : forecastURL,
         json : true,
-    } , function (error, response) {
+    } , function (error, {body}) {
 
         if(error) {
             callback(chalk.bgRed('ERROR : No network connection!'), undefined)
-        } else if (response.body.error) {
+        } else if (body.error) {
             callback(chalk.bgRed('ERROR : Could not fetch data'), undefined)
         } else {
-            callback(undefined , response.body)
+            callback(undefined , body)
         }
     })
 }
