@@ -40,6 +40,20 @@ app.get('/weather', (req,res) => {
     })
 })
 
+app.get('/help/*', (req,res) => {
+    res.render('404', {
+        code : 404, 
+        errorMessage : 'Help article not found'
+    })
+})
+
+app.get('*', (req,res) => {
+    res.render('404', {
+        code : 404,
+        errorMessage : 'Page not found'
+    })
+})
+
 
 app.listen(3000, () => {
     console.log('Server up and running on port 3000')
