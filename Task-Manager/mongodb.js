@@ -44,18 +44,38 @@ MongoClient.connect(connectionURL, {useNewUrlParser : true, useUnifiedTopology: 
     //     console.log(result.insertedCount)
     // })
 
-    db.collection('Users').findOne({
-        name : 'Tanvi',
-    }, (error, foundUser) => {
-        if(error){
-            return console.log(error)
+    // db.collection('Users').findOne({
+    //     name : 'Tanvi',
+    // }, (error, foundUser) => {
+    //     if(error){
+    //         return console.log(error)
+    //     }
+    //     console.log(foundUser)
+    // })
+
+    // db.collection('Tasks').find({isCompleted : false}).toArray( (error, result) => {
+    //     console.log(result)
+    // })
+
+    // db.collection('Users').updateOne({
+    //     name : 'Tanvi',
+    // }, {
+    //     $inc : {
+    //         age : 1
+    //     }
+    // }).then((result)=>{
+    //     console.log(result)
+    // }).catch(error => console.log(error))
+
+
+    db.collection('Tasks').updateMany({
+        isCompleted : true,
+    }, {
+        $set : {
+            isCompleted : false,
         }
-        console.log(foundUser)
     })
-
-    db.collection('Tasks').find({isCompleted : false}).toArray( (error, result) => {
-        console.log(result)
-    })
-
+    .then(result => console.log(result))
+    .catch(error => console.log(error))
 })
 
