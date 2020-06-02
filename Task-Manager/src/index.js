@@ -26,6 +26,18 @@ app.post('/tasks', (req,res) => {
         .catch((e) => {res.status(400).send(e)})
 })
 
+app.patch('/users/:id', (req,res) => {
+    User.findByIdAndUpdate(req.params.id, {name : 'John'})
+        .then(updatedUser => res.send(updatedUser))
+        .catch(e => res.status(400).send(e))
+})
+
+app.patch('/tasks/:taskID', (req,res) => {
+    Task.findByIdAndUpdate(req.params.taskID, {description : 'Changed'})
+        .then(updatedTask => res.send(updatedTask))
+        .catch(e => res.status(400).send(e))
+})
+
 app.get('/users', (req,res) => {
     User.find({})
         .then( users => res.status(200).send(users))
