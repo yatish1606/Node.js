@@ -26,7 +26,13 @@ userRouter.patch('/users/:id', async (req,res) => {
     }
 
     try {
-        const userToPatch = await User.findByIdAndUpdate(req.params.id, req.body, {new : true, runValidators: true})
+
+        const userToPatch = await User.findById(req.params.id)
+
+        requestBodyUpdateKeys.forEach(update => userToPatch[update] = req.body[update])
+
+        await userToPatch.save()
+        
         if(!userToPatch){
             res.status(404).send()
         }
@@ -78,6 +84,17 @@ userRouter.get('/users/:id', async (req,res) => {
         res.send(foundUser)
     } catch(e) {
         res.status(500).send()
+    }
+    
+})
+
+userRouter.post('/users/login', async (req,res) => {
+    
+    try {
+        const loggedInUser = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(loggedInUser)
+    } catch (e) {
+        res.status(400).send()
     }
     
 })

@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 const chalk = require('chalk')
 const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
-const User = mongoose.model('User', {
+const userSchema =  new mongoose.Schema({
     name : {
         type : String,
         required : true,
@@ -21,6 +22,7 @@ const User = mongoose.model('User', {
         type : String,
         required : true,
         trim : true,
+        unique : true,
         validate(value) {
             if (! validator.isEmail(value)) {
                 throw new Error(chalk.red('Invalid email!'))
@@ -40,5 +42,32 @@ const User = mongoose.model('User', {
         }
     }
 })
+
+userSchema.statics.findByCredentials = async(email,password) => {
+    const userToLogin = await User.findOne({email})
+    
+    if(!userToLogin) {
+        throw new Error('Unable to log in')
+    }
+    
+    const isMatch = await bcrypt.compare(password, userToLogin.password)
+
+    if(!isMatch) {
+        throw new Error('Unable to log in')
+    }
+
+    return userToLogin
+}
+
+userSchema.pre('save', async function (next) {
+    
+    const user = this
+    if(user.isModified){
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+    next()
+})
+
+const User = mongoose.model('User', userSchema)
 
 module.exports = User
