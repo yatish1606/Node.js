@@ -30,16 +30,48 @@ app.post('/tasks', async (req,res) => {
     }
 })
 
-app.patch('/users/:id', (req,res) => {
-    User.findByIdAndUpdate(req.params.id, {name : 'John'})
-        .then(updatedUser => res.send(updatedUser))
-        .catch(e => res.status(400).send(e))
+app.patch('/users/:id', async (req,res) => {
+
+    const allowedUpdates = ['name','email','password','age']
+    const requestBodyUpdateKeys = Object.keys(req.body)
+    const isValidUpdateOperation = requestBodyUpdateKeys.every( update => allowedUpdates.includes(update))
+
+    if(!isValidUpdateOperation){
+        res.status(404).send({errorMessage : 'Invalid Updates'})
+    }
+
+    try {
+        const userToPatch = await User.findByIdAndUpdate(req.params.id, req.body, {new : true, runValidators: true})
+        if(!userToPatch){
+            res.status(404).send()
+        }
+        res.send(userToPatch)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+        
 })
 
-app.patch('/tasks/:taskID', (req,res) => {
-    Task.findByIdAndUpdate(req.params.taskID, {description : 'Changed'})
-        .then(updatedTask => res.send(updatedTask))
-        .catch(e => res.status(400).send(e))
+app.patch('/tasks/:taskID', async (req,res) => {
+
+    const allowedUpdates = ['description','completed']
+    const requestBodyUpdateKeys = Object.keys(req.body)
+    const isValidUpdateOperation = requestBodyUpdateKeys.every( update => allowedUpdates.includes(update))
+
+    if(!isValidUpdateOperation){
+        res.status(404).send({errorMessage : 'Invalid Updates'})
+    }
+    
+    try {
+        const taskToPatch = await Task.findByIdAndUpdate(req.params.taskID, req.body, {new : true, runValidators: true})
+        if(!taskToPatch){
+            res.status(404).send()
+        }
+        res.send(taskToPatch)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+        
 })
 
 app.get('/users', async (req,res) => {
