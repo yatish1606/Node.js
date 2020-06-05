@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const chalk = require('chalk')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const userSchema =  new mongoose.Schema({
     name : {
@@ -40,8 +41,22 @@ const userSchema =  new mongoose.Schema({
                 throw new Error(chalk.red('Password must be 6 or more characters!'))
             }
         }
-    }
+    },
+    tokens : [{
+        token : {
+            type: String,
+            required : true
+        }
+    }]
 })
+
+userSchema.methods.generateAuthenticationToken = async function () {
+    const user = this
+    const userToken = jwt.sign({_id : user._id.toString()}, 'thisisastring')
+    user.tokens = user.tokens.concat({token : userToken})
+    await user.save()
+    return userToken
+}
 
 userSchema.statics.findByCredentials = async(email,password) => {
     const userToLogin = await User.findOne({email})
