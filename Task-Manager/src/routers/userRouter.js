@@ -58,20 +58,8 @@ userRouter.delete('/users/:id', async (req,res) => {
     }
 })
 
-userRouter.get('/users', auth ,async (req,res) => {
-
-    try {
-        const users = await User.find({})
-    
-        if(!users) {
-            return res.status(404).send()
-        }
-
-        res.status(201).send(users)
-    } catch(e) {
-        res.status(500).send(e)
-    }
-    
+userRouter.get('/users/me', auth ,async (req,res) => {
+    res.send(req.user)
 })
 
 userRouter.get('/users/:id', async (req,res) => {
