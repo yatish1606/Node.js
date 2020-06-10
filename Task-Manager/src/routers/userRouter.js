@@ -24,7 +24,7 @@ userRouter.patch('/users/:id', async (req,res) => {
     const isValidUpdateOperation = requestBodyUpdateKeys.every( update => allowedUpdates.includes(update))
 
     if(!isValidUpdateOperation){
-        res.status(404).send({errorMessage : 'Invalid Updates'})
+        res.status(400).send({errorMessage : 'Invalid Updates'})
     }
 
     try {
@@ -58,7 +58,9 @@ userRouter.delete('/users/:id', async (req,res) => {
     }
 })
 
-userRouter.get('/users/me', auth ,async (req,res) => {
+userRouter.get('/users/me' ,async (req,res) => {
+    console.log('hi')
+    console.log(req.user)
     res.send(req.user)
 })
 
@@ -81,10 +83,15 @@ userRouter.get('/users/:id', async (req,res) => {
 userRouter.post('/users/login', async (req,res) => {
     
     try {
+        console.log('hi')
+        console.log(req.body.email, req.body.password)
         const loggedInUser = await User.findByCredentials(req.body.email, req.body.password)
+        console.log(loggedInUser)
         const userToken = await loggedInUser.generateAuthenticationToken()
         res.send({loggedInUser, userToken})
+        console.log(userToken)
     } catch (e) {
+        console.log('here')
         res.status(400).send()
     }
     
