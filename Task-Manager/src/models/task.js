@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const chalk = require('chalk')
-const validator = require('validator')
 
 const Task = mongoose.model('Task', {
     description: {
