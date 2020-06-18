@@ -5,6 +5,7 @@ const express = require('express')
 const http = require('http')
 const socketIO = require('socket.io')
 const Filter = require('bad-words')
+const utilityFunctions = require('./utils/messages')
 
 const app = express()
 const server = http.createServer(app)
@@ -29,13 +30,13 @@ io.on('connection', (socket) => {
     console.log('New socket connection')
 
     // this will send a welcome message to a new user who has joined the chat
-    socket.emit('message', 'Welcome') 
+    socket.emit('message', utilityFunctions.generateMessage('Welcome')) 
 
     // socket.emit() => emit a message only to that connection
     // socket.broadcat.emit() => emit a message to all except new connection
 
     // send a message to all users except the new user
-    socket.broadcast.emit('message', "A new user just joined the chat")
+    socket.broadcast.emit('message', utilityFunctions.generateMessage("A new user just joined the chat"))
     
     socket.on('sendMessage', (message, callback) => {
 
@@ -45,19 +46,19 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed!')
         }
 
-        io.emit('message', message)
+        io.emit('message', utilityFunctions.generateMessage(message))
         callback()
     })
 
     // when any user shares their location, emit that message to all users
     socket.on('sendLocation', (locationObject, callback) => {
-        io.emit('message', `https://google.com/maps?q=${locationObject.latitude},${locationObject.longitude}`)
+        io.emit('locationMessage', utilityFunctions.generateLocationMessage(`https://google.com/maps?q=${locationObject.latitude},${locationObject.longitude}`))
         callback()
     })
 
     // socket.on('disconnect') will run when any user leaves the chat or connection is broken
     socket.on('disconnect', () => {
-        io.emit('message', "A user has left the chat")
+        io.emit('message', utilityFunctions.generateMessage("A user has left the chat"))
     })
 
 })
