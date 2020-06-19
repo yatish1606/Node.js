@@ -6,6 +6,7 @@ const http = require('http')
 const socketIO = require('socket.io')
 const Filter = require('bad-words')
 const utilityFunctions = require('./utils/messages')
+const userFunctions = require('./utils/users')
 
 const app = express()
 const server = http.createServer(app)
@@ -31,42 +32,56 @@ io.on('connection', (socket) => {
 
     
     // join a specific chat room 
-    socket.on('join', ({username,room}) => {
+    socket.on('join', (options, callback) => {
 
-        socket.join(room)
+        const {error, user} = userFunctions.addUser({
+            id : socket.id,
+            ...options
+        })
+
+        if(error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
 
         // this will send a welcome message to a new user who has joined the chat
-        socket.emit('message', utilityFunctions.generateMessage('Welcome')) 
+        socket.emit('message', utilityFunctions.generateMessage('Sys : ','Welcome')) 
 
         // socket.emit() => emit a message only to that connection
         // socket.broadcat.emit() => emit a message to all except new connection
 
         // send a message to all users except the new user
-        socket.broadcast.to(room).emit('message', utilityFunctions.generateMessage(`${username} has joined the chat`))
-        
+        socket.broadcast.to(user.room).emit('message', utilityFunctions.generateMessage('Sys : ',`${user.username} has joined the chat`))
+        callback()
     })
     
     socket.on('sendMessage', (message, callback) => {
 
-        const filter = new Filter()
-
-        if(filter.isProfane(message)) {
+        const user = userFunctions.getUser(socket.id)
+        
+        if(new Filter().isProfane(message)) {
             return callback('Profanity is not allowed!')
         }
 
-        io.emit('message', utilityFunctions.generateMessage(message))
+        io.to(user.room).emit('message', utilityFunctions.generateMessage(user.username,message))
         callback()
     })
 
     // when any user shares their location, emit that message to all users
     socket.on('sendLocation', (locationObject, callback) => {
-        io.emit('locationMessage', utilityFunctions.generateLocationMessage(`https://google.com/maps?q=${locationObject.latitude},${locationObject.longitude}`))
+        const user = userFunctions.getUser(socket.id)
+        io.to(user.room).emit('locationMessage', utilityFunctions.generateLocationMessage(user.username,`https://google.com/maps?q=${locationObject.latitude},${locationObject.longitude}`))
         callback()
     })
 
     // socket.on('disconnect') will run when any user leaves the chat or connection is broken
-    socket.on('disconnect', () => {
-        io.emit('message', utilityFunctions.generateMessage("A user has left the chat"))
+    socket.on('disconnect', () => {      
+        const removedUser = userFunctions.removeUser(socket.id)
+
+        if(removedUser) {
+            io.to(removedUser.room).emit('message', utilityFunctions.generateMessage('Sys : ',`${removedUser.username} has left the chat`))
+        }
     })
 
     
