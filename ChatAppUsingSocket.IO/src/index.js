@@ -29,14 +29,22 @@ io.on('connection', (socket) => {
 
     console.log('New socket connection')
 
-    // this will send a welcome message to a new user who has joined the chat
-    socket.emit('message', utilityFunctions.generateMessage('Welcome')) 
+    
+    // join a specific chat room 
+    socket.on('join', ({username,room}) => {
 
-    // socket.emit() => emit a message only to that connection
-    // socket.broadcat.emit() => emit a message to all except new connection
+        socket.join(room)
 
-    // send a message to all users except the new user
-    socket.broadcast.emit('message', utilityFunctions.generateMessage("A new user just joined the chat"))
+        // this will send a welcome message to a new user who has joined the chat
+        socket.emit('message', utilityFunctions.generateMessage('Welcome')) 
+
+        // socket.emit() => emit a message only to that connection
+        // socket.broadcat.emit() => emit a message to all except new connection
+
+        // send a message to all users except the new user
+        socket.broadcast.to(room).emit('message', utilityFunctions.generateMessage(`${username} has joined the chat`))
+        
+    })
     
     socket.on('sendMessage', (message, callback) => {
 
@@ -60,6 +68,8 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         io.emit('message', utilityFunctions.generateMessage("A user has left the chat"))
     })
+
+    
 
 })
 
