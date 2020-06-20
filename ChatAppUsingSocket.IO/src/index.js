@@ -53,6 +53,11 @@ io.on('connection', (socket) => {
 
         // send a message to all users except the new user
         socket.broadcast.to(user.room).emit('message', utilityFunctions.generateMessage('Sys : ',`${user.username} has joined the chat`))
+        
+        io.to(user.room).emit('roomData', {
+            room : user.room,
+            users : userFunctions.getUsersInRoom(user.room)
+        })
         callback()
     })
     
@@ -81,6 +86,11 @@ io.on('connection', (socket) => {
 
         if(removedUser) {
             io.to(removedUser.room).emit('message', utilityFunctions.generateMessage('Sys : ',`${removedUser.username} has left the chat`))
+            
+            io.to(removedUser.room).emit('roomData', {
+                room : removedUser.room,
+                users : userFunctions.getUsersInRoom(removedUser.room)
+            })
         }
     })
 
