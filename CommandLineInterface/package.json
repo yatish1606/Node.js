@@ -1,0 +1,16 @@
+{
+  "name": "commandlineinterface",
+  "version": "1.0.0",
+  "description": "Customer Management CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^5.1.0",
+    "inquirer": "^7.2.0",
+    "mongoose": "^5.9.20"
+  }
+}
