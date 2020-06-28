@@ -26,10 +26,36 @@ const findCustomer = (name) => {
             console.info(`${customer.length} matches`)
             db.close()
         })
+}
 
+const updateCustomer = (_id, customer) => {
+    Customer.update({_id}, customer)
+        .then(customer => console.info('Customer has been updated'))
+        db.close()
+}
+
+const removeCustomer = _id => {
+    Customer.deleteOne({_id})
+        .then(customer => {
+            console.info('Customer removed')
+            db.close()
+        })
+}
+        
+
+const listAllCustomers = () => {
+    Customer.find()
+        .then(customers => {
+            console.info(customers)
+            console.info(`${customers.length} customers`)
+            db.close()
+        })     
 }
 
 module.exports = {
     addCustomer,
-    findCustomer
+    findCustomer,
+    updateCustomer,
+    removeCustomer,
+    listAllCustomers
 }
