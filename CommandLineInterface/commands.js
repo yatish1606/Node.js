@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const program = require('commander')
 const callingFunctions = require('./index')
 const {prompt} = require('inquirer')
@@ -69,6 +71,9 @@ program
     })
 
 program
-    .command
+    .command('list')
+    .alias('l')
+    .description('List out all the customers in the database')
+    .action(() => callingFunctions.listAllCustomers())
 
 program.parse(process.argv)
